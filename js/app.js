@@ -52,30 +52,45 @@ function getTasks() {
 
 // Add task
 function addTask(e) {
-  if (taskInput.value === '') {
-    alert('Please add a task');
-  }
-  // Create li element
-  const li = document.createElement('li');
-  // Add class
-  li.className = 'collection-item';
-  // Create text node and append to li
-  li.appendChild(document.createTextNode(taskInput.value));
-  // Create new link element
-  const link = document.createElement('a');
-  // Add class
-  link.className = 'delete-item secondary-content';
-  // Add icon html
-  link.innerHTML = '<i class="fa fa-remove"></i>';
-  // Append the link to li
-  li.appendChild(link);
-  // Append li to ul
-  taskList.appendChild(li);
-  // Store in local storage
-  storeTaskInLocalStorage(taskInput.value);
-  // Clear input
-  taskInput.value = '';
   e.preventDefault();
+  if (taskInput.value === '') {
+    alert('Please enter a task');
+  } else if (checkTasks()) {
+    taskInput.value = '';
+  } else {
+    // Create li element
+    const li = document.createElement('li');
+    // Add class
+    li.className = 'collection-item';
+    // Create text node and append to li
+    li.appendChild(document.createTextNode(taskInput.value));
+    // Create new link element
+    const link = document.createElement('a');
+    // Add class
+    link.className = 'delete-item secondary-content';
+    // Add icon html
+    link.innerHTML = '<i class="fa fa-remove"></i>';
+    // Append the link to li
+    li.appendChild(link);
+    // Append li to ul
+    taskList.appendChild(li);
+    // Store in local storage
+    storeTaskInLocalStorage(taskInput.value);
+    // Clear input
+    taskInput.value = '';
+  }
+}
+
+// Check if task exists
+function checkTasks() {
+  const task = taskInput.value;
+  const lis = document.querySelectorAll('.collection-item');
+  for (const li of lis) {
+    if (li.textContent === task) {
+      alert('This task already exists.');
+      return true;
+    }
+  }
 }
 
 // Store task in localStorage
@@ -120,13 +135,11 @@ function removeTaskFromLocalStorage(taskItem) {
   if (localStorage.getItem('tasks') === null) {
     tasks = [];
   } else {
-    tasks = JSON.parse(localStorage.getItem('tasks'));
+    tasksFromStorage = JSON.parse(localStorage.getItem('tasks'));
+    tasks = tasksFromStorage.filter(function (task) {
+      return taskItem.textContent !== task;
+    });
   }
-  tasks.forEach(function (task, index) {
-    if (taskItem.textContent === task) {
-      tasks.splice(index, 1);
-    }
-  });
   localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
